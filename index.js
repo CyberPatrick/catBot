@@ -32,6 +32,7 @@ async function start() {
 
 await start();
 const bot = new TelegramBot(token, { webHook: { port: process.env.PORT, host: process.env.HOST } });
+bot.setWebHook(`https://telegram-cat-bot.herokuapp.com:443/${token}`)
 console.log('Bot started');
 
 bot.on('callback_query', async cb => {

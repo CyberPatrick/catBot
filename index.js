@@ -31,7 +31,7 @@ async function start() {
 
 
 await start();
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token, { polling: true, webhook: { port: prcocess.env.PORT, host: process.env.HOST } });
 console.log('Bot started');
 
 bot.on('callback_query', async cb => {

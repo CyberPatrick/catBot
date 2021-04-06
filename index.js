@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const mongoose = require('mongoose');
 const Photos = require('./models/photo');
-const token = '1745502625:AAGtpFO26U3JuoEn58387mFBXm8i8UDZhXA';
+const token = `${process.ENV.TOKEN}`;
 const boss_id = 949930616;
 const channel_id = '@Thehottest_cats'
 const keyboard = {
@@ -17,7 +17,7 @@ const keyboard = {
 async function main() {
 async function start() {
   try {
-    await mongoose.connect('mongodb+srv://Nikita:VssRpfcmUXmpwq3c@cluster0.onow1.mongodb.net/myFirstDatabase', {
+    await mongoose.connect(`mongodb+srv://Nikita:${process.env.PASSWORD}@cluster0.onow1.mongodb.net/myFirstDatabase`, {
       useNewUrlParser: true,
       useFindAndModify: false,
       useUnifiedTopology: true,

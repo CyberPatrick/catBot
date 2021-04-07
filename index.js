@@ -41,7 +41,7 @@ bot.on('callback_query', async cb => {
     bot.answerCallbackQuery(cb.id, { text: 'Фото не найдено'});
   } else {
     if (cb.data[0] === 'y') {
-      bot.sendPhoto(channel_id, photo.file_id);
+      await bot.sendPhoto(channel_id, photo.file_id);
       bot.answerCallbackQuery(cb.id, { text: 'Фото опубликовано'});
       bot.sendMessage(photo.author_id, 'Ваша киска опубликована');
     } else {
@@ -66,7 +66,7 @@ bot.on('message', async msg => {
     let keyboardCallback = Object.assign({}, keyboard);
     keyboardCallback.inline_keyboard[0][0].callback_data = 'y' + photo_id;
     keyboardCallback.inline_keyboard[0][1].callback_data = 'n' + photo_id;
-    bot.sendPhoto(boss_id, msg.photo[0].file_id);
+    await bot.sendPhoto(boss_id, msg.photo[0].file_id);
     bot.sendMessage(boss_id, 'Опубликовать?', { reply_markup: keyboard });
   } else {
     bot.sendMessage(msg.chat.id, 'Вы не отправили картинку киски.')

@@ -48,7 +48,7 @@ bot.on('callback_query', async cb => {
     bot.answerCallbackQuery(cb.id, { text: 'Фото не найдено'});
   } else {
     if (cb.data[0] === 'y') {
-      await bot.sendPhoto(channel_id, photo.file_id);
+      await bot.sendPhoto(channel_id, photo.file_id, { caption: `Прислал(а): ${photo.author_name} ${photo.author_last_name}` });
       bot.answerCallbackQuery(cb.id, { text: 'Фото опубликовано'});
       bot.sendMessage(photo.author_id, 'Ваша киска опубликована');
       bot.editMessageText('Фото опубликовано', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: empty_keyboard  });
@@ -66,10 +66,14 @@ bot.on('message', async msg => {
     let photo_id = random_id();
     let file_id = msg.photo[0].file_id;
     let author_id = msg.chat.id;
+    let author_name = msg.from.first_name;
+    let author_last_name = msg.from.last_name;
     let photo = new Photos({
       photo_id,
       file_id,
       author_id,
+      author_name,
+      author_last_name,
     });
     await photo.save();
     let keyboardCallback = Object.assign({}, keyboard);

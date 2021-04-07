@@ -12,6 +12,13 @@ const keyboard = {
     ]
   ]
 }
+const empty_keyboard = {
+  "inline_keyboard": [
+    [
+
+    ]
+  ]
+}
 
 
 async function main() {
@@ -44,9 +51,11 @@ bot.on('callback_query', async cb => {
       await bot.sendPhoto(channel_id, photo.file_id);
       bot.answerCallbackQuery(cb.id, { text: 'Фото опубликовано'});
       bot.sendMessage(photo.author_id, 'Ваша киска опубликована');
+      bot.editMessageText('Фото опубликовано', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: empty_keyboard  });
     } else {
       bot.answerCallbackQuery(cb.id, { text: 'Фото было удалено из БД' });
       bot.sendMessage(photo.author_id, 'Фото не прошло модерацию');
+      bot.editMessageText('Фото отклонено', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: empty_keyboard });
     }
     photo.remove();
   }

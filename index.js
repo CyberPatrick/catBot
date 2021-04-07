@@ -48,7 +48,8 @@ bot.on('callback_query', async cb => {
     bot.answerCallbackQuery(cb.id, { text: 'Фото не найдено'});
   } else {
     if (cb.data[0] === 'y') {
-      await bot.sendPhoto(channel_id, photo.file_id, { caption: `Прислал(а): ${photo.author_name} ${photo.author_last_name}` });
+      let author = photo.author_name ? `${photo.author_name} ${photo.author_last_name  ? photo.author_last_name : ''}` : 'Неизвестный';
+      await bot.sendPhoto(channel_id, photo.file_id, { caption: `Прислал(а): ${author}` });
       bot.answerCallbackQuery(cb.id, { text: 'Фото опубликовано'});
       bot.sendMessage(photo.author_id, 'Ваша киска опубликована');
       bot.editMessageText('Фото опубликовано', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: empty_keyboard  });

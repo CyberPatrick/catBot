@@ -45,6 +45,7 @@ console.log('Bot started');
 bot.on('callback_query', async cb => {
   let photo = await Photos.findOne({ photo_id: cb.data.slice(1) });
   if (!photo) {
+    console.log(cb);
     bot.answerCallbackQuery(cb.id, { text: 'Фото не найдено'});
   } else {
     if (cb.data[0] === 'y') {

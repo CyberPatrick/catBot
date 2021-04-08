@@ -7,8 +7,8 @@ const channel_id = '@Thehottest_cats'
 const keyboard = {
   "inline_keyboard": [
     [
-      { "text": 'Да' , "callback_data": '' },
-      { "text": 'Нет' , "callback_data": '' }
+      { "text": 'Да' , "callback_data": 'y' },
+      { "text": 'Нет' , "callback_data": 'n' }
     ]
   ]
 }
@@ -78,8 +78,8 @@ bot.on('message', async msg => {
     });
     await photo.save();
     let keyboardCallback = Object.assign({}, keyboard);
-    keyboardCallback.inline_keyboard[0][0].callback_data = 'y' + photo_id;
-    keyboardCallback.inline_keyboard[0][1].callback_data = 'n' + photo_id;
+    keyboardCallback.inline_keyboard[0][0].callback_data += photo_id;
+    keyboardCallback.inline_keyboard[0][1].callback_data += photo_id;
     await bot.sendPhoto(boss_id, msg.photo[0].file_id);
     bot.sendMessage(boss_id, 'Опубликовать?', { reply_markup: keyboard });
   } else {

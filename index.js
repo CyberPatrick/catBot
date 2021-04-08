@@ -65,24 +65,28 @@ bot.on('callback_query', async cb => {
 
 bot.on('message', async msg => {
   if (msg.photo) {
-    console.log(msg.photo);
-    let photo_id = random_id();
-    let file_id = msg.photo[0].file_id;
-    let author_id = msg.chat.id;
-    let author_name = msg.from.first_name;
-    let author_last_name = msg.from.last_name;
-    let photo = new Photos({
-      photo_id,
-      file_id,
-      author_id,
-      author_name,
-      author_last_name,
-    });
-    await photo.save();
-    keyboard.inline_keyboard[0][0].callback_data = 'y' + photo_id;
-    keyboard.inline_keyboard[0][1].callback_data = 'n' + photo_id;
-    await bot.sendPhoto(boss_id, msg.photo[0].file_id);
-    bot.sendMessage(boss_id, 'Опубликовать?', { reply_markup: keyboard });
+    let file_array = [];
+    for (let picture of msg.photo) {
+      if (file_array.includes(picture.file_id)) continue;
+      file_array.push(picture.file_id);
+      let photo_id = random_id();
+      let file_id = msg.photo[0].file_id;
+      let author_id = msg.chat.id;
+      let author_name = msg.from.first_name;
+      let author_last_name = msg.from.last_name;
+      let photo = new Photos({
+        photo_id,
+        file_id,
+        author_id,
+        author_name,
+        author_last_name,
+      });
+      await photo.save();
+      keyboard.inline_keyboard[0][0].callback_data = 'y' + photo_id;
+      keyboard.inline_keyboard[0][1].callback_data = 'n' + photo_id;
+      await bot.sendPhoto(boss_id, msg.photo[0].file_id);
+      bot.sendMessage(boss_id, 'Опубликовать?', { reply_markup: keyboard });
+    }
   } else {
     bot.sendMessage(msg.chat.id, 'Вы не отправили картинку киски.')
   }

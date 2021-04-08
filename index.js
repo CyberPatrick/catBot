@@ -59,24 +59,27 @@ bot.on('callback_query', async cb => {
       bot.sendMessage(photo.author_id, 'Фото не прошло модерацию');
       bot.editMessageText('Фото отклонено', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: empty_keyboard });
     }
-    photo.remove();
   }
 })
 
 bot.on('message', async msg => {
+  let hash = [];
   if (msg.photo) {
-    let file_array = [];
     for (let picture of msg.photo) {
-      if (file_array.includes(picture.file_id)) continue;
-      file_array.push(picture.file_id);
+      if (hash.includes(picture.file_unique_id)) continue;
+      let coincidence = await Photos.findOne({ file_unique_id: picture.file_unique_id });
+      hash.push(picture.file_unique_id);
+      if (!coincidence) continue;
       let photo_id = random_id();
-      let file_id = msg.photo[0].file_id;
+      let file_id = picture.file_id;
+      let file_unique_id = picture.file_unique_id;
       let author_id = msg.chat.id;
       let author_name = msg.from.first_name;
       let author_last_name = msg.from.last_name;
       let photo = new Photos({
         photo_id,
         file_id,
+        file_unique_id,
         author_id,
         author_name,
         author_last_name,
@@ -84,7 +87,7 @@ bot.on('message', async msg => {
       await photo.save();
       keyboard.inline_keyboard[0][0].callback_data = 'y' + photo_id;
       keyboard.inline_keyboard[0][1].callback_data = 'n' + photo_id;
-      await bot.sendPhoto(boss_id, msg.photo[0].file_id);
+      await bot.sendPhoto(boss_id, file_id);
       bot.sendMessage(boss_id, 'Опубликовать?', { reply_markup: keyboard });
     }
   } else {

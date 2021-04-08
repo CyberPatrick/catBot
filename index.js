@@ -65,8 +65,9 @@ bot.on('callback_query', async cb => {
 bot.on('message', async msg => {
   let hash = [];
   if (msg.photo) {
+    console.log(msg.photo);
+    console.log('----------------')
     for (let picture of msg.photo) {
-      console.log(picture)
       if (hash.includes(picture.file_unique_id)) continue;
       let coincidence = await Photos.findOne({ file_unique_id: picture.file_unique_id });
       hash.push(picture.file_unique_id);

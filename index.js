@@ -65,6 +65,7 @@ bot.on('callback_query', async cb => {
 
 bot.on('message', async msg => {
   if (msg.photo) {
+    console.log(msg.photo);
     let photo_id = random_id();
     let file_id = msg.photo[0].file_id;
     let author_id = msg.chat.id;

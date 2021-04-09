@@ -18,10 +18,10 @@ const empty_keyboard = {
 
     ]
   ]
-}
+};
 
 
-async function main() {
+(async function () {
 async function start() {
   try {
     await mongoose.connect(`mongodb+srv://Nikita:${process.env.PASSWORD}@cluster0.onow1.mongodb.net/myFirstDatabase`, {
@@ -45,22 +45,23 @@ console.log('Bot started');
 bot.on('callback_query', async cb => {
   let photo = await Photos.findOne({ photo_id: cb.data.slice(1) });
   if (!photo) {
-    console.log(cb);
     bot.answerCallbackQuery(cb.id, { text: 'Фото не найдено'});
   } else {
     if (cb.data[0] === 'y') {
       let author = photo.author_name ? `${photo.author_name} ${photo.author_last_name  ? photo.author_last_name : ''}` : 'Неизвестный';
-      await bot.sendPhoto(channel_id, photo.file_id, { caption: `Прислал(а): ${author}` });
+      bot.sendPhoto(channel_id, photo.file_id, { caption: `Прислал(а): ${author}` });
       bot.answerCallbackQuery(cb.id, { text: 'Фото опубликовано'});
       bot.sendMessage(photo.author_id, 'Ваша киска опубликована');
-      bot.editMessageText('Фото опубликовано', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: empty_keyboard  });
+      bot.editMessageCaption('Фото опубликовано', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: empty_keyboard  });
     } else {
       bot.answerCallbackQuery(cb.id, { text: 'Фото было удалено из БД' });
       bot.sendMessage(photo.author_id, 'Фото не прошло модерацию');
-      bot.editMessageText('Фото отклонено', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: empty_keyboard });
+      bot.editMessageCaption('Фото отклонено', { chat_id: cb.message.chat.id, message_id: cb.message.message_id, reply_markup: empty_keyboard });
     }
   }
-  photo.remove();
+  photo.remove().catch(err => {
+    console.log(err);
+  });
 })
 
 bot.on('message', async msg => {
@@ -81,8 +82,7 @@ bot.on('message', async msg => {
     let keyboardCallback = Object.assign({}, keyboard);
     keyboardCallback.inline_keyboard[0][0].callback_data = 'y' + photo_id;
     keyboardCallback.inline_keyboard[0][1].callback_data = 'n' + photo_id;
-    await bot.sendPhoto(boss_id, file_id);
-    bot.sendMessage(boss_id, 'Опубликовать?', { reply_markup: keyboard });
+    bot.sendPhoto(boss_id, file_id, { caption: 'Опубликовать?', reply_markup: keyboard });
   } else {
     bot.sendMessage(msg.chat.id, 'Вы не отправили картинку киски.')
   }
@@ -92,6 +92,4 @@ bot.on('message', async msg => {
 function random_id () {
   return Math.floor(Math.random() * 1000000).toString();
 }
-}
-
-main();
+})();

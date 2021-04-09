@@ -1,6 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const mongoose = require('mongoose');
 const Photos = require('./models/photo');
+const Users = require('./models/user');
 const token = `${process.env.TOKEN}`;
 const boss_id = 949930616;
 const channel_id = '@Thehottest_cats'
@@ -44,11 +45,19 @@ console.log('Bot started');
 
 bot.on('callback_query', async cb => {
   let photo = await Photos.findOne({ photo_id: cb.data.slice(1) });
+  let user;
   if (!photo) {
     bot.answerCallbackQuery(cb.id, { text: 'Фото не найдено'});
   } else {
+    user = await Users.findOne({ user_id: photo.author_id });
+    if (!user) {
+      user = new Users({
+        user_id: photo.author_id
+      });
+      await user.save();
+    }
     if (cb.data[0] === 'y') {
-      let author = photo.author_name ? `${photo.author_name} ${photo.author_last_name  ? photo.author_last_name : ''}` : 'Неизвестный';
+      let author = user.show_name ? photo.author_name ? `${photo.author_name} ${photo.author_last_name  ? photo.author_last_name : ''}` : 'Неизвестный' : 'Неизвестный';
       bot.sendPhoto(channel_id, photo.file_id, { caption: `Прислал(а): ${author}` });
       bot.answerCallbackQuery(cb.id, { text: 'Фото опубликовано'});
       bot.sendMessage(photo.author_id, 'Ваша киска опубликована');
@@ -65,7 +74,30 @@ bot.on('callback_query', async cb => {
 })
 
 bot.on('message', async msg => {
-  if (msg.photo) {
+  if (msg.text === '/show_my_name') {
+    let user = await Users.findOne({ user_id: msg.from.id });
+    if (!user) {
+      user = new Users({
+        user_id: msg.from.id
+      });
+      await user.save();
+    } else {
+      user.show_name = !user.show_name;
+      await user.save();
+      bot.sendMessage(msg.chat.id, `Теперь ваше имя ${user.show_name ? 'будет отображаться.' : 'не будет отображаться.'}`);
+    }
+  } else if (msg.text === '/info') {
+    let user = await Users.findOne({ user_id: msg.from.id });
+    if (!user) {
+      user = new Users({
+        user_id: msg.from.id
+      });
+      await user.save();
+      bot.sendMessage(msg.chat.id, 'У вас включено отображение имени.');
+    } else {
+      bot.sendMessage(msg.chat.id, `У вас ${user.show_name ? 'включено ' : 'выключено '} отображение имени.`)
+    }
+  } else if (msg.photo) {
     let photo_id = random_id();
     let file_id = msg.photo[0].file_id;
     let author_id = msg.chat.id;
